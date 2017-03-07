@@ -178,10 +178,13 @@
 			 * --- m1, m2, m3, ..., mk in bucket m
 			 */
 			{
-				// TODO: Find a way to check whether the numbers are evenly distributed.
+				// TODO: Find a better way to check whether the numbers are evenly distributed, in which case there are
+				// at the most 'step' number of elements in each bucket.
+				var isEvenlyDistributed = true;
 				var bucketSize = step;
 				var factor = Math.floor((max - min) / (n - 1));
-				outputs = new Array(bucketSize * n);
+				var maxSpace = (bucketSize + 1) * n;
+				outputs = new Array(maxSpace);
 				for (var counter = 0; counter < n; counter++) {
 					var number = inputs[counter];
 					var key = Math.floor((number - min) / factor);
@@ -196,14 +199,23 @@
 							outputs[index + subCounter] = number;
 							number = subNumber;
 						}
+						if (outputs.length > maxSpace) {
+							isEvenlyDistributed = false;
+							break;
+						}
+					}
+					if (!isEvenlyDistributed) {
+						break;
 					}
 				}
-				oSpace = oSpace + outputs.length;
-				outputs = outputs.filter(function(o) {
-					oTime++;
-					return o != undefined;
-				});
-				return outputs;
+				if (isEvenlyDistributed) {
+					oSpace = oSpace + outputs.length;
+					outputs = outputs.filter(function(o) {
+						oTime++;
+						return o != undefined;
+					});
+					return outputs;
+				}
 			}
 
 			/*
