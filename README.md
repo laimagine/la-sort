@@ -30,4 +30,28 @@ Once the numbers have been aligned, move them in respective buckets and then sor
         * all numbers in a bucket (m) are less than all numbers in bucket (m+1)
         * all numbers in a bucket (m) are greater than all numbers in bucket (m-1)
 * since the buckets have at the most 'k' elements, it is easier to sort them as-is
-* once all the numbers in each bucket are sorted, then join the buckets in order of their indices.
+    * _0, 0, 1, 1, 1_ in bucket 1
+    * _2, 4, 7, 8_ in bucket 2
+* then replace the shrunk numbers with their original counterparts
+    * _8, 12, 18, 19, 26_
+    * _34, 53, 80, 92_
+* once all the numbers in each bucket are sorted, then join the buckets in order of their indices
+    * _8, 12, 18, 19, 26, 34, 53, 80, 92_
+
+__NOTE__ It is important to note that the above case works when the numbers are evenly distributed. If that is not the case, and if the numbers are in clusters:
+* identify the clusters and the numbers that belong to each cluster
+* run the sorting algorithm on each cluster separately
+* join individual results, in the order of their keys
+
+#Testing
+The 
+
+#Feedback
+The algorithm is __NOT__ extensively tested. The [la-sort.html](https://github.com/laimagine/la-sort/blob/master/src/html/la-sort.html) test application attempts to test random combinations and compares the algorithm's complexities with that of binary sort. For the most part, it seems to indicate that __LA Sort__ perform much better than Binary Sort.
+
+Please feel free to take this out for a spin and provide your feedback.
+
+## More Information
+Email: contact@laimagine.com
+
+## Thank you.
