@@ -34,17 +34,20 @@
 		// Flag that determines whether to display input and sorted numbers.
 		var paint = true;
 
-		// Counter to determine the number of iterations the sorting algorithm took.
- 		var oCounter = 0;
+		// Counter to determine the time complexity
+ 		var oTime = 0;
+
+		// Variable to determine the space complexity
+ 		var oSpace = 0;
 
  		// The start value for getting random numbers. Essentially, all the random numbers will be >= start.
 		var start = 1000;
 
  		// The end value for getting random numbers. Essentially, all the random numbers will be <= end.
-		var end = 100000;
+		var end = 10000;
 
  		// The size of the input number set.
-		var size = 50000;
+		var size = 5000;
 
  		// The step value for determining bucket size.
 		var step = 20;
@@ -54,18 +57,21 @@
 	 		var outputs;
 
 			var inputs = generateRandomNumbers();
-			document.getElementById('log').innerHTML = '';
 
-			oCounter = 0;
+			oTime = 0;
+			oSpace = 0;
 	 		outputs = binary_sort(inputs);
-			document.getElementById('log').innerHTML = document.getElementById('log').innerHTML + '<br/>Binary Iterations: ' + oCounter;
+			document.getElementById('binary-time').innerHTML = 'Time: ' + oTime;
+			document.getElementById('binary-space').innerHTML = 'Space: ' + oSpace;
 	 		if (paint) {
 				document.getElementById('binary-outputs').value = outputs.join('\n');
 	 		}
 
-			oCounter = 0;
+			oTime = 0;
+			oSpace = 0;
 			outputs = la_sort(inputs);
-			document.getElementById('log').innerHTML = document.getElementById('log').innerHTML + '<br/>LA Iterations: ' + oCounter;
+			document.getElementById('la-time').innerHTML = 'Time: ' + oTime;
+			document.getElementById('la-space').innerHTML = 'Space: ' + oSpace;
 	 		if (paint) {
 				document.getElementById('la-outputs').value = outputs.join('\n');
 	 		}
@@ -85,6 +91,7 @@
 			{
 				if (n <= step) {
 					outputs = binary_sort(inputs);
+					oSpace = oSpace + outputs.length;
 					return outputs;
 				}
 			}
@@ -92,7 +99,7 @@
 			var min;
 			var max;
 			for (var counter = 0; counter < n; counter++) {
-				oCounter++;
+				oTime++;
 				var number = inputs[counter];
 				min = (min == undefined || min > number) ? number : min;
 				max = (max == undefined || max < number) ? number : max;
@@ -115,9 +122,10 @@
 				if ((max - min) == (n - 1)) {
 					outputs = [];
 					for (var counter = min; counter <= max; counter++) {
-						oCounter++;
+						oTime++;
 						outputs.push(counter);
 					}
+					oSpace = oSpace + outputs.length;
 					return outputs;
 				}
 			}
@@ -138,7 +146,7 @@
 			{
 				var factor = (max - min) / (n - 1);
 				for (var counter = 0; counter < n; counter++) {
-					oCounter++;
+					oTime++;
 					var isMultiples = true;
 					if (((inputs[counter] - min) % factor) != 0) {
 						isMultiples = false;
@@ -148,9 +156,10 @@
 				if (isMultiples) {
 					outputs = [];
 					for (var counter = 0; counter < n; counter++) {
-						oCounter++;
+						oTime++;
 						outputs.push((min + counter) * factor);
 					}
+					oSpace = oSpace + outputs.length;
 					return outputs;
 				}
 			}
@@ -178,7 +187,7 @@
 					var key = Math.floor((number - min) / factor);
 					var index = key * bucketSize;
 					for (var subCounter = 0; subCounter < bucketSize; subCounter++) {
-						oCounter++;
+						oTime++;
 						var subNumber = outputs[index + subCounter];
 						if (subNumber == undefined) {
 							outputs[index + subCounter] = number;
@@ -189,8 +198,9 @@
 						}
 					}
 				}
+				oSpace = oSpace + outputs.length;
 				outputs = outputs.filter(function(o) {
-					oCounter++;
+					oTime++;
 					return o != undefined;
 				});
 				return outputs;
@@ -252,7 +262,7 @@
 				var delta = delta || Math.floor(0.1 * factor);
 				var clusterCount = Math.ceil(n / clusterSize);
 				for (var counter = 0; counter < n; counter++) {
-					oCounter++;
+					oTime++;
 					var number = inputs[counter];
 					var key = '' + Math.floor((number - min) / (factor * clusterSize));
 					if (clusters[key] == undefined) {
@@ -263,17 +273,18 @@
 
 				outputs = [];
 				for (var clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++) {
-					oCounter++;
+					oTime++;
 					var subInputs = clusters[clusterIndex];
 					if (subInputs && subInputs.length > 0) {
 						var subSortedOutputs = la_sort(subInputs, delta);
 						subSortedOutputs.forEach(function(number) {
-							oCounter++;
+							oTime++;
 							outputs.push(number);
 						});
 					}
 				}
 
+				oSpace = oSpace + outputs.length;
 				return outputs;
 			}
 		}
@@ -285,10 +296,10 @@
 			var length = inputs.length;
 			var outputs = [];
 			if (length == 1) {
-				oCounter++;
+				oTime++;
 				outputs.push(inputs[0]);
 			} else if (length == 2) {
-				oCounter++;
+				oTime++;
 				if (inputs[0] < inputs[1]) {
 					outputs.push(inputs[0]);
 					outputs.push(inputs[1]);
@@ -316,7 +327,7 @@
 				var rightCounter = 0;
 
 				while (leftCounter < leftInputs.length && rightCounter < rightInputs.length) {
-					oCounter++;
+					oTime++;
 					if (leftInputs[leftCounter] < rightInputs[rightCounter]) {
 						outputs.push(leftInputs[leftCounter]);
 						leftCounter++;
@@ -334,6 +345,7 @@
 				}
 
 			}
+			oSpace = oSpace + outputs.length;
 			return outputs;
 		}
 
@@ -387,13 +399,26 @@
 			</tr>
 			<tr>
 				<td>
-					<textarea cols="10" rows="25" id="inputs"></textarea>
+					<textarea cols="10" rows="40" id="inputs"></textarea>
 				</td>
 				<td>
-					<textarea cols="10" rows="25" id="binary-outputs" disabled=""></textarea>
+					<textarea cols="10" rows="40" id="binary-outputs" disabled=""></textarea>
 				</td>
 				<td>
-					<textarea cols="10" rows="25" id="la-outputs" disabled=""></textarea>
+					<textarea cols="10" rows="40" id="la-outputs" disabled=""></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					&nbsp;
+				</td>
+				<td>
+					<div id="binary-time"></div>
+					<div id="binary-space"></div>
+				</td>
+				<td>
+					<div id="la-time"></div>
+					<div id="la-space"></div>
 				</td>
 			</tr>
 			<tr>
@@ -410,10 +435,6 @@
 				</td>
 			</tr>
 		</table>
-		<p/>
-		<div id="log">
-
-		</div>
 	</div>
 
 </body>
