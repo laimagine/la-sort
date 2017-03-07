@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<!--
+/**
+  * The MIT License (MIT)
+  *
+  * Copyright (c) 2017 laimagine
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+  * in the Software without restriction, including without limitation the rights
+  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  * copies of the Software, and to permit persons to whom the Software is
+  * furnished to do so, subject to the following conditions:
+  *
+  * The above copyright notice and this permission notice shall be included in all
+  * copies or substantial portions of the Software.
+  *
+  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  * SOFTWARE.
+  *
+  * <author>LA Imagine</author>
+  * <email>contact@laimagine.com</email>
+  */
+-->
+<html>
+<head>
+	<script>
+
+		// Flag that determines whether to display input and sorted numbers.
+		var paint = true;
+
+		// Counter to determine the number of iterations the sorting algorithm took.
+ 		var oCounter = 0;
+
+ 		// The start value for getting random numbers. Essentially, all the random numbers will be >= start.
+		var start = 1000;
+
+ 		// The end value for getting random numbers. Essentially, all the random numbers will be <= end.
+		var end = 100000;
+
+ 		// The size of the input number set.
+		var size = 50000;
+
+ 		// The step value for determining bucket size.
+		var step = 20;
+
+	 	function c() {
+
+	 		var outputs;
+
+			var inputs = generateRandomNumbers();
+			document.getElementById('log').innerHTML = '';
+
+			oCounter = 0;
+	 		outputs = binary_sort(inputs);
+			document.getElementById('log').innerHTML = document.getElementById('log').innerHTML + '<br/>Binary Iterations: ' + oCounter;
+	 		if (paint) {
+				document.getElementById('binary-outputs').value = outputs.join('\n');
+	 		}
+
+			oCounter = 0;
+			outputs = la_sort(inputs);
+			document.getElementById('log').innerHTML = document.getElementById('log').innerHTML + '<br/>LA Iterations: ' + oCounter;
+	 		if (paint) {
+				document.getElementById('la-outputs').value = outputs.join('\n');
+	 		}
+	 	}
+
+	 	/**
+	 	 * TODO: Adding doc
+	 	 */
+		function la_sort(inputs, delta) {
+
+			var n = inputs.length;
+			var outputs;
+
+			/*
+			 * Case 1: If the size of inputs is small enough, then sort them as-is.
+			 */
+			{
+				if (n <= step) {
+					outputs = binary_sort(inputs);
+					return outputs;
+				}
+			}
+
+			var min;
+			var max;
+			for (var counter = 0; counter < n; counter++) {
+				oCounter++;
+				var number = inputs[counter];
+				min = (min == undefined || min > number) ? number : min;
+				max = (max == undefined || max < number) ? number : max;
+			}
+
+			/*
+			 * Case 2: If (max - min) == (n - 1), it implies that this is the ideal case where the numbers are
+			 * consecutive, from min to max. In which case, the sorted values will be:
+			 * --- min
+			 * --- (min + 1)
+			 * --- (min + 2)
+			 * --- ...
+			 * --- ...
+			 * --- ...
+			 * --- (max - 2)
+			 * --- (max - 1)
+			 * --- max
+			 */
+			{
+				if ((max - min) == (n - 1)) {
+					outputs = [];
+					for (var counter = min; counter <= max; counter++) {
+						oCounter++;
+						outputs.push(counter);
+					}
+					return outputs;
+				}
+			}
+
+			/*
+			 * Case 2: If not consecutive, check whether the inputs are consecutive multiples of some number.
+			 * In which case, the sorted values will be:
+			 * --- min + (1 * factor)
+			 * --- min + (2 * factor)
+			 * --- min + (3 * factor)
+			 * --- ...
+			 * --- ...
+			 * --- ...
+			 * --- max - (2 * factor)
+			 * --- max - (1 * factor)
+			 * --- max
+			 */
+			{
+				var factor = (max - min) / (n - 1);
+				for (var counter = 0; counter < n; counter++) {
+					oCounter++;
+					var isMultiples = true;
+					if (((inputs[counter] - min) % factor) != 0) {
+						isMultiples = false;
+						break;
+					}
+				}
+				if (isMultiples) {
+					outputs = [];
+					for (var counter = 0; counter < n; counter++) {
+						oCounter++;
+						outputs.push((min + counter) * factor);
+					}
+					return outputs;
+				}
+			}
+
+			/*
+			 * Case 3: If not consecutive multiples, check whether they are closely distributed, as in whether
+			 * the numbers can be divided into buckets of approximately equal sizes, then group the numbers into
+			 * buckets of maximim size, which is the factor.
+			 * In which case, the sorted numbers will be close to:
+			 * --- a1, a2, a3, ..., ak in bucket 1
+			 * --- b1, b2, b3, ..., bk in bucket 2
+			 * --- c1, c2, c3, ..., ck in bucket 3
+			 * --- ...
+			 * --- ...
+			 * --- ...
+			 * --- m1, m2, m3, ..., mk in bucket m
+			 */
+			{
+				// TODO: Find a way to check whether the numbers are evenly distributed.
+				var bucketSize = step;
+				var factor = Math.floor((max - min) / (n - 1));
+				outputs = new Array(bucketSize * n);
+				for (var counter = 0; counter < n; counter++) {
+					var number = inputs[counter];
+					var key = Math.floor((number - min) / factor);
+					var index = key * bucketSize;
+					for (var subCounter = 0; subCounter < bucketSize; subCounter++) {
+						oCounter++;
+						var subNumber = outputs[index + subCounter];
+						if (subNumber == undefined) {
+							outputs[index + subCounter] = number;
+							break;
+						} else if (number < subNumber) {
+							outputs[index + subCounter] = number;
+							number = subNumber;
+						}
+					}
+				}
+				outputs = outputs.filter(function(o) {
+					oCounter++;
+					return o != undefined;
+				});
+				return outputs;
+			}
+
+			/*
+			 * Case 4: If the numbers are not even distributed, it means that they are in clusters. Therefore,
+			 * find the different clusters and, on each cluster, run the sorting algorithm to get sorted subsets.
+			 * Then combine all these subsets in ascending order to get the sorted values.
+			 * In which case, the numbers will be:
+			 * --- a(1)   [ = min]
+			 * --- a(2)   [ = (a(1) * factor) +/- delta)]
+			 * --- a(3)   [ = (a(2) * factor) +/- delta)]
+			 * --- ...
+			 * --- ...
+			 * --- ...
+			 * --- a(i-2) [ = (a(i-3) * factor) +/- delta)]
+			 * --- a(i-1) [ = (a(i-2) * factor) +/- delta)]
+			 * --- a(i)   [ = (a(i-1) * factor) +/- delta)]
+			 *
+			 * --- b(1)
+			 * --- b(2)   [ = (b(1) * factor) +/- delta)]
+			 * --- b(3)   [ = (b(2) * factor) +/- delta)]
+			 * --- ...
+			 * --- ...
+			 * --- ...
+			 * --- b(j-2) [ = (b(j-3) * factor) +/- delta)]
+			 * --- b(j-1) [ = (b(j-2) * factor) +/- delta)]
+			 * --- b(j)   [ = (b(j-1) * factor) +/- delta)]
+			 *
+			 * --- c(1)
+			 * --- c(2)   [ = (a(1) * factor) +/- delta)]
+			 * --- c(3)   [ = (a(2) * factor) +/- delta)]
+			 *
+			 * --- ...
+			 * --- ...
+			 * --- ...
+			 *
+			 * --- c(k-2) [ = (c(k-3) * factor) +/- delta)]
+			 * --- c(k-1) [ = (c(k-2) * factor) +/- delta)]
+			 * --- c(k)   [ = (c(k-1) * factor) +/- delta)]
+			 * --- ...
+			 * --- ...
+			 * --- ...
+			 * --- z(1)
+			 * --- z(2)   [ = (z(1) * factor) +/- delta)]
+			 * --- z(3)   [ = (z(2) * factor) +/- delta)]
+			 * --- ...
+			 * --- ...
+			 * --- ...
+			 * --- z(l-2) [ = (z(l-3) * factor) +/- delta)]
+			 * --- z(l-1) [ = (z(l-2) * factor) +/- delta)]
+			 * --- z(l)   [ = (z(l-1) * factor) +/- delta)]
+			 */
+			{
+				var clusters = {};
+				var clusterSize = step;
+				var factor = Math.floor((max - min) / (n - 1));
+				var delta = delta || Math.floor(0.1 * factor);
+				var clusterCount = Math.ceil(n / clusterSize);
+				for (var counter = 0; counter < n; counter++) {
+					oCounter++;
+					var number = inputs[counter];
+					var key = '' + Math.floor((number - min) / (factor * clusterSize));
+					if (clusters[key] == undefined) {
+						clusters[key] = [];
+					}
+					clusters[key].push(number);
+				}
+
+				outputs = [];
+				for (var clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++) {
+					oCounter++;
+					var subInputs = clusters[clusterIndex];
+					if (subInputs && subInputs.length > 0) {
+						var subSortedOutputs = la_sort(subInputs, delta);
+						subSortedOutputs.forEach(function(number) {
+							oCounter++;
+							outputs.push(number);
+						});
+					}
+				}
+
+				return outputs;
+			}
+		}
+
+	 	/**
+	 	 * Binary sort, for comparison purposes.
+	 	 */
+		function binary_sort(inputs) {
+			var length = inputs.length;
+			var outputs = [];
+			if (length == 1) {
+				oCounter++;
+				outputs.push(inputs[0]);
+			} else if (length == 2) {
+				oCounter++;
+				if (inputs[0] < inputs[1]) {
+					outputs.push(inputs[0]);
+					outputs.push(inputs[1]);
+				} else {
+					outputs.push(inputs[1]);
+					outputs.push(inputs[0]);
+				}
+			} else if (inputs.length > 2) {
+
+				var mid = Math.floor(length / 2);
+				var leftInputs = [];
+				var rightInputs = [];
+
+				for (counter = 0; counter < mid; counter++) {
+					leftInputs.push(inputs[counter]);
+				}
+				for (counter = mid; counter < inputs.length; counter++) {
+					rightInputs.push(inputs[counter]);
+				}
+
+				leftInputs = binary_sort(leftInputs);
+				rightInputs = binary_sort(rightInputs);
+
+				var leftCounter = 0;
+				var rightCounter = 0;
+
+				while (leftCounter < leftInputs.length && rightCounter < rightInputs.length) {
+					oCounter++;
+					if (leftInputs[leftCounter] < rightInputs[rightCounter]) {
+						outputs.push(leftInputs[leftCounter]);
+						leftCounter++;
+					} else {
+						outputs.push(rightInputs[rightCounter]);
+						rightCounter++;
+					}
+				}
+
+				for (var counter = leftCounter; counter < leftInputs.length; counter++) {
+					outputs.push(leftInputs[counter]);	
+				}
+				for (var counter = rightCounter; counter < rightInputs.length;counter++) {
+					outputs.push(rightInputs[counter]);	
+				}
+
+			}
+			return outputs;
+		}
+
+		/**
+		 * Random number generator function.
+		 */
+		function generateRandomNumbers() {
+			
+			var arr = new Array(end - start);
+			for (var i = 0; i < arr.length; i++) {
+				arr[i] = i * 50;
+			}
+
+			for (var i = 0; i <= size*2; i++) {
+				var j = Math.floor(Math.random() * end);
+				temp = arr[i];
+		        arr[i] = arr[j];
+		        arr[j] = temp;
+			}
+			arr = arr.filter(function(o) {
+				return o != undefined;
+			});
+			arr = arr.splice(0, size);
+
+	 		if (paint) {
+				document.getElementById('inputs').value = arr.join('\n');
+				document.getElementById('binary-outputs').value = '';
+				document.getElementById('la-outputs').value = '';
+			}
+
+			return arr;
+		}
+
+	</script>
+</head>
+
+<body>
+
+	<div >
+		<table>
+			<tr>
+				<td width="20%">
+					Unsorted
+				</td>
+				<td width="20%">
+					Binary
+				</td>
+				<td width="20%">
+					LA
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<textarea cols="10" rows="25" id="inputs"></textarea>
+				</td>
+				<td>
+					<textarea cols="10" rows="25" id="binary-outputs" disabled=""></textarea>
+				</td>
+				<td>
+					<textarea cols="10" rows="25" id="la-outputs" disabled=""></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button onclick="generateRandomNumbers()">Generate</button>
+				</td>
+				<td colspan="2">
+					<button onclick="c()">Sort!</button>
+				</td>
+			</tr>
+		</table>
+		<p/>
+		<div id="log">
+
+		</div>
+	</div>
+
+</body>
+</html>
