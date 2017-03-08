@@ -1,5 +1,5 @@
 #LA Sort
-LA Sort is a sorting algorithm that attempts to achieve a O(kn) time and O(kn) space complexities, where 'k' is a constant and is far less than 'n'.
+LA Sort is a sorting algorithm that attempts to achieve a O(kn) time and O(kn) space complexities, where 'k' is a constant, such that k << n.
 
 The algorithm achieves this by aligning the numbers as close to sequential numbers as possible. Once aligned, since the numbers are sequential, they can be ordered consecutively.
 
