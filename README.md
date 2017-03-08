@@ -43,6 +43,9 @@ __NOTE__ It is important to note that the above case works when the numbers are 
 * run the sorting algorithm on each cluster separately
 * join individual results, in the order of their keys
 
+#Test
+Please feel free test the algorithm on codepen: http://codepen.io/laimagine/pen/EWZjOX
+
 #Feedback
 The algorithm is __NOT__ extensively tested. The [la-sort.html](https://github.com/laimagine/la-sort/blob/master/src/html/la-sort.html) test application attempts to test random combinations and compares the algorithm's complexities with that of binary sort. For the most part, it seems to indicate that __LA Sort__ perform much better than Binary Sort.
 
