@@ -1,9 +1,9 @@
-#LA Sort
+## LA Sort
 LA Sort is a sorting algorithm that attempts to achieve a O(kn) time and O(kn) space complexities, where 'k' is a constant, such that k << n.
 
 The algorithm achieves this by aligning the numbers as close to sequential numbers as possible. Once aligned, since the numbers are sequential, they can be ordered consecutively.
 
-#Approach
+# Approach
 Consider the following set of numbers:
 
 _12, 18, 53, 8, 19, 26, 80, 34, 92_
@@ -43,10 +43,10 @@ __NOTE__ It is important to note that the above case works when the numbers are 
 * run the sorting algorithm on each cluster separately
 * join individual results, in the order of their keys
 
-#Test
+# Test
 Please feel free test the algorithm on codepen: http://codepen.io/laimagine/pen/EWZjOX
 
-#Feedback
+## Feedback
 The algorithm is __NOT__ extensively tested. The [la-sort.html](https://github.com/laimagine/la-sort/blob/master/src/html/la-sort.html) test application attempts to test random combinations and compares the algorithm's complexities with that of binary sort. For the most part, it seems to indicate that __LA Sort__ performs better than Binary Sort does.
 
 Please feel free to take this out for a spin and provide your feedback.
