@@ -29,7 +29,7 @@ Once the numbers have been aligned, move them in respective buckets and then sor
     * after the split, the numbers in each bucket will be in such a way that:
         * all numbers in a bucket (m) are less than all numbers in bucket (m+1)
         * all numbers in a bucket (m) are greater than all numbers in bucket (m-1)
-* since the buckets have at the most 'k' elements, it is easier to sort them as-is
+* since the buckets have at the most 'k' elements, it is easier to sort them using other well-known algorithms.
     * _0, 0, 1, 1, 1_ in bucket 1
     * _2, 4, 7, 8_ in bucket 2
 * then replace the shrunk numbers with their original counterparts
@@ -50,6 +50,9 @@ Please feel free test the algorithm on codepen: http://codepen.io/laimagine/pen/
 The algorithm is __NOT__ extensively tested. The [la-sort.html](https://github.com/laimagine/la-sort/blob/master/src/html/la-sort.html) test application attempts to test random combinations and compares the algorithm's complexities with that of binary sort. For the most part, it seems to indicate that __LA Sort__ performs better than Binary Sort does.
 
 Please feel free to take this out for a spin and provide your feedback.
+
+### Update 2018-12-08
+Just came across [Bucket Sort](https://en.wikipedia.org/wiki/Bucket_sort) to realize that __LA Sort__ is very similar! In fact, __LA Sort__ improves on it by providing a good way to map elements into their corresponding buckets.
 
 ## More Information
 Email: contact@laimagine.com
